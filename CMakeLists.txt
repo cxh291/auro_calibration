@@ -9,11 +9,15 @@ find_package(catkin REQUIRED
             cv_bridge
             image_transport
             camera_info_manager
+            pcl_ros
+            sensor_msgs
+            message_filters
         )
 # set(CMAKE_CXX_FLAGS "-std=c++0x ${CMAKE_CXX_FLAGS}")
 
 # find_package(Eigen3 REQUIRED)
 find_package(Boost REQUIRED)
+find_package(PCL REQUIRED)
 find_package(OpenCV REQUIRED)
 
 include_directories(
@@ -21,6 +25,7 @@ include_directories(
     ${catkin_INCLUDE_DIRS}
     ${EIGEN_INCLUDE_DIRS}
     ${OpenCV_INCLUDE_DIRS}
+    ${PCL_INCLUDE_DIRS}
     )
 
 add_definitions(${EIGEN_DEFINITIONS})
@@ -32,12 +37,12 @@ catkin_package(
     CATKIN_DEPENDS
 )
 
-# add_library(auro_calibration src/auro_calibration.cpp)
-# target_link_libraries(auro_calibration ${catkin_LIBRARIES} ${Boost_LIBRARIES} ${Boost_LIBRARIES})
-# add_dependencies(auro_calibration arti_msgs_gencpp)
+# add_library(lidar_calibrator src/lidar_calibrator.cpp)
+# target_link_libraries(lidar_calibrator ${catkin_LIBRARIES} ${Boost_LIBRARIES} ${Boost_LIBRARIES})
+# add_dependencies(lidar_calibrator sensor_msgs_gencpp)
 
-# add_executable(auro_calibration src/auro_calibration.cpp)
-# target_link_libraries(auro_calibration ${catkin_LIBRARIES} ${Boost_LIBRARIES} ${OpenCV_LIBS})
+add_executable(lidar_calibrator_node src/lidar_calibrator.cpp)
+target_link_libraries(lidar_calibrator_node ${catkin_LIBRARIES} ${Boost_LIBRARIES} ${OpenCV_LIBS} ${PCL_LIBS})
 
 # install(TARGETS 
 #        ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}

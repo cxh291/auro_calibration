@@ -1,13 +1,11 @@
 <launch>
     <include file="$(find auro_calibration)/launch/bag_replay.launch"/>
 
-    <arg name="size" default="8x6"/>
-    <arg name="monocular" default="8x6"/>
-    <arg name="square" default="0.108"/>
+    <arg name="size" default="5x7"/>
+    <arg name="square" default="0.05"/>
     <arg name="no-service-check" default="true"/>
-    <node pkg="camera_calibration" type="cameracalibrator.py" name="camera_calibration" output="screen" args="
-    	--size $(arg size)
-    	--square 0.108">
+    <node pkg="camera_calibration" type="cameracalibrator.py" name="camera_calibration" output="screen" 
+        args="--size $(arg size) --square $(arg square)">
         <remap from="image" to="/sensors/camera/image_color"/>
         <!-- <remap from="camera" to="/sensors/camera"/> -->
     </node>
