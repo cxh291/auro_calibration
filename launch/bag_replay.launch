@@ -1,0 +1,4 @@
+<launch>
+<arg name="file_path" default="$(find auro_calibration)/record/2016-11-22-14-32-13_test.bag"/>
+<node pkg="rosbag" type="play" name="rosbag_replay" args="$(arg file_path)"/>
+</launch>

@@ -1,0 +1,11 @@
+<launch>
+    <include file="$(find auro_calibration)/launch/bag_replay.launch"/>
+    <arg name="size" default="8x6"/>
+    <arg name="monocular" default="8x6"/>
+    <arg name="square" default="0.108"/>
+    <arg name="no-service-check" default="true"/>
+    <node pkg="image_proc" type="image_proc" name="image_proc" output="screen" args="" ns="/sensors/camera">
+        <remap from="image_raw" to="image_color"/>
+        <!-- <remap from="camera_info" to="/sensors/camera/camera_info"/> -->
+    </node>
+</launch>
