@@ -57,10 +57,23 @@ void sensorCallback(const sensor_msgs::ImageConstPtr& image_msg, const sensor_ms
 		ROS_ERROR("Could not convert from '%s' to 'bgr8'.", image_msg->encoding.c_str());
 	}
 	opc = pc;
-	filterByYawAngle(-1,1,pc,opc);
+	filterByDistance(2,5,pc,opc);
 	sensor_msgs::PointCloud2 opc_msg;
 	pcl::toROSMsg(opc, opc_msg);
 	pc_pub_.publish(opc_msg);
+}
+
+void filterByDistance(double mind, double maxd, const PointCloud &ipc, PointCloud& opc){
+	opc.clear();
+	BOOST_FOREACH(const pcl::PointXYZ& pt, ipc.points)
+	{
+		Eigen::Vector3f v(pt.x, pt.y, pt.z);
+		double radius = v.squaredNorm();
+		// std::cout << phi << std::endl;
+		if (radius > mind && radius < maxd){
+			opc.push_back(pt);
+		}
+	}
 }
 
 void filterByYawAngle(double sangle, double eangle, const PointCloud &ipc, PointCloud& opc){
