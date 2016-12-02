@@ -13,7 +13,7 @@ find_package(catkin REQUIRED
             sensor_msgs
             message_filters
         )
-# set(CMAKE_CXX_FLAGS "-std=c++0x ${CMAKE_CXX_FLAGS}")
+set(CMAKE_CXX_FLAGS "-std=c++0x ${CMAKE_CXX_FLAGS}")
 
 # find_package(Eigen3 REQUIRED)
 find_package(Boost REQUIRED)

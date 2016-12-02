@@ -2,5 +2,6 @@
 	<node name="lidar_calibrator_node" pkg="auro_calibration" type="lidar_calibrator_node" output="screen">
 		<remap from="point_cloud" to="/sensors/velodyne_points"/>
 		<remap from="image"       to="/sensors/camera/image_color"/>
+		<remap from="camera_info"       to="/sensors/camera/camera_info"/>
 	</node>
 </launch>
