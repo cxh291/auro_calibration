@@ -10,6 +10,7 @@
 #include <message_filters/subscriber.h>
 #include <message_filters/time_synchronizer.h>
 #include <message_filters/sync_policies/approximate_time.h>
+#include <Eigen/Dense>
 
 typedef pcl::PointCloud<pcl::PointXYZ> PointCloud;
 
@@ -23,7 +24,7 @@ LidarCalibrator(ros::NodeHandle nh){
 	// ros::Subscriber pc_sub = nh.subscribe<sensor_msgs::PointCloud2>("point_cloud", 1, boost::bind(&LidarCalibrator::pointCloudCallback, this, _1));
 	// image_transport::ImageTransport it(nh);
 	// image_transport::Subscriber sub = it.subscribe("image", 1, &LidarCalibrator::imageCallback, this);
-
+	pc_pub_ = nh.advertise<sensor_msgs::PointCloud2>("filterd_point_cloud", 1);
 	message_filters::Subscriber<sensor_msgs::Image> image_sub(nh, "image", 1);
 	message_filters::Subscriber<sensor_msgs::PointCloud2> pc_sub(nh, "point_cloud", 1);
 	// typedef message_filters::sync_policies::ExactTime<sensor_msgs::Image, sensor_msgs::PointCloud2> MySyncPolicy;
@@ -38,11 +39,12 @@ LidarCalibrator(ros::NodeHandle nh){
 void sensorCallback(const sensor_msgs::ImageConstPtr& image_msg, const sensor_msgs::PointCloud2::ConstPtr& pc_msg){
 	ROS_INFO_ONCE("Recieved Point Cloud");
 
-	printf ("Cloud: width = %d, height = %d\n", pc_msg->width, pc_msg->height);
+	// printf ("Cloud: width = %d, height = %d\n", pc_msg->width, pc_msg->height);
 	PointCloud pc;
+	PointCloud opc;
 	pcl::fromROSMsg(*pc_msg, pc);
-	BOOST_FOREACH (const pcl::PointXYZ& pt, pc.points)
-	  printf ("\t(%f, %f, %f)\n", pt.x, pt.y, pt.z);
+	// BOOST_FOREACH (const pcl::PointXYZ& pt, pc.points)
+	//   printf ("\t(%f, %f, %f)\n", pt.x, pt.y, pt.z);
 
 	ROS_INFO_ONCE("Recieved Images");
 	try
@@ -54,8 +56,30 @@ void sensorCallback(const sensor_msgs::ImageConstPtr& image_msg, const sensor_ms
 	{
 		ROS_ERROR("Could not convert from '%s' to 'bgr8'.", image_msg->encoding.c_str());
 	}
+	opc = pc;
+	filterByYawAngle(-1,1,pc,opc);
+	sensor_msgs::PointCloud2 opc_msg;
+	pcl::toROSMsg(opc, opc_msg);
+	pc_pub_.publish(opc_msg);
 }
 
+void filterByYawAngle(double sangle, double eangle, const PointCloud &ipc, PointCloud& opc){
+	opc.clear();
+	BOOST_FOREACH(const pcl::PointXYZ& pt, ipc.points)
+	{
+		// Eigen::Vector3f v(pt.x, pt.y, pt.z);
+		// double theta = acos(pt.z/v.squaredNorm());
+		double phi = atan2(pt.y, pt.x);
+		// std::cout << phi << std::endl;
+		if (phi > sangle && phi < eangle){
+			opc.push_back(pt);
+		}
+	}
+	// std::cout << ipc.size() << " " << opc.size() << std::endl;
+}
+
+private:
+ros::Publisher pc_pub_;
 // void pointCloudCallback(const sensor_msgs::PointCloud2::ConstPtr& msg)
 // {
 // 	ROS_INFO_ONCE("Recieved Point Cloud");
